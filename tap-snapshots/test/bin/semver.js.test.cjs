@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/bin/semver.js TAP coercing > 1.2.3.4.5.6 -c --rtl --ltr 1`] = `
+exports[`test/bin/semver.js > TAP > coercing > 1.2.3.4.5.6 -c --rtl --ltr 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -14,7 +14,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP coercing > 1.2.3.4.5.6 -c --rtl 1`] = `
+exports[`test/bin/semver.js > TAP > coercing > 1.2.3.4.5.6 -c --rtl 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -23,7 +23,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP coercing > 1.2.3.4.5.6 -c 1`] = `
+exports[`test/bin/semver.js > TAP > coercing > 1.2.3.4.5.6 -c 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -32,7 +32,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP coercing > not a version -c 1`] = `
+exports[`test/bin/semver.js > TAP > coercing > not a version -c 1`] = `
 Object {
   "code": 1,
   "err": "",
@@ -41,7 +41,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP coercing > not a version 1.2.3 -c 1`] = `
+exports[`test/bin/semver.js > TAP > coercing > not a version 1.2.3 -c 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -50,7 +50,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP help output > (no args) 1`] = `
+exports[`test/bin/semver.js > TAP > help output > --help 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -111,7 +111,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP help output > --help 1`] = `
+exports[`test/bin/semver.js > TAP > help output > -? 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -172,7 +172,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP help output > -? 1`] = `
+exports[`test/bin/semver.js > TAP > help output > -h 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -233,7 +233,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP help output > -h 1`] = `
+exports[`test/bin/semver.js > TAP > help output > (no args) 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -294,7 +294,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i 1.2.3 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i 1.2.3 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -303,7 +303,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i invalid 1.0.0 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i invalid 1.0.0 1`] = `
 Object {
   "code": 0,
   "err": "Invalid value for -i; defaulting to 'patch'. This may become a failure in future major versions.\\n",
@@ -312,7 +312,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i major -i minor 1.0.0 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i major -i minor 1.0.0 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -321,7 +321,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i major 1.0.0 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i major 1.0.0 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -330,7 +330,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i major 1.0.0 1.0.1 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i major 1.0.0 1.0.1 1`] = `
 Object {
   "code": 1,
   "err": "--inc can only be used on a single version with no range\\n",
@@ -339,7 +339,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i premajor 1.0.0 --preid=beta -n 1 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i premajor 1.0.0 --preid=beta -n 1 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -348,7 +348,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i premajor 1.0.0 --preid=beta -n false 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i premajor 1.0.0 --preid=beta -n false 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -357,7 +357,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i premajor 1.0.0 --preid=beta 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i premajor 1.0.0 --preid=beta 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -366,7 +366,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP inc tests > -i release 1.0.0-pre 1`] = `
+exports[`test/bin/semver.js > TAP > inc tests > -i release 1.0.0-pre 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -375,7 +375,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 -v 3.2.1 --version 2.3.4 -rv 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 -v 3.2.1 --version 2.3.4 -rv 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -389,7 +389,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 -v 3.2.1 --version 2.3.4 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 -v 3.2.1 --version 2.3.4 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -403,7 +403,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 3.2.1 -r 2.x 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 3.2.1 -r 2.x 1`] = `
 Object {
   "code": 1,
   "err": "",
@@ -412,7 +412,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 3.2.1 -r 2.x 2.3.4 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 3.2.1 -r 2.x 2.3.4 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -421,7 +421,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 3.2.1 2.3.4 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 3.2.1 2.3.4 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -435,7 +435,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 3.2.1 2.3.4 2.3.4-beta 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 3.2.1 2.3.4 2.3.4-beta 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -450,7 +450,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 3.2.1 2.3.4 2.3.4-beta 2.0.0asdf -r 2.x -p 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 3.2.1 2.3.4 2.3.4-beta 2.0.0asdf -r 2.x -p 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -463,7 +463,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3 3.2.1 2.3.4 2.3.4-beta 2.0.0asdf -r 2.x 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3 3.2.1 2.3.4 2.3.4-beta 2.0.0asdf -r 2.x 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -472,7 +472,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3beta -l 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3beta -l 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -481,7 +481,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3foo 1.2.3-bar -l 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3foo 1.2.3-bar -l 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -494,7 +494,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 1.2.3foo 1.2.3-bar 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 1.2.3foo 1.2.3-bar 1`] = `
 Object {
   "code": 0,
   "err": "",
@@ -503,7 +503,7 @@ Object {
 }
 `
 
-exports[`test/bin/semver.js TAP sorting and filtering > 3.2.1 2.3.4 2.3.4-beta 2.0.0asdf -r 2.x -p -l 1`] = `
+exports[`test/bin/semver.js > TAP > sorting and filtering > 3.2.1 2.3.4 2.3.4-beta 2.0.0asdf -r 2.x -p -l 1`] = `
 Object {
   "code": 0,
   "err": "",

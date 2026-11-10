@@ -41,9 +41,8 @@
   "tap": {
     "timeout": 30,
     "coverage-map": "map.js",
-    "nyc-arg": [
-      "--exclude",
-      "tap-snapshots/**"
+    "plugin": [
+      "!@tapjs/typescript"
     ]
   },
   "engines": {
