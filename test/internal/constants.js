@@ -1,18 +1,19 @@
 'use strict'
 
-const t = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const constants = require('../../internal/constants')
 
-t.match(constants, {
-  MAX_LENGTH: Number,
-  MAX_SAFE_COMPONENT_LENGTH: Number,
-  MAX_SAFE_INTEGER: Number,
-  WHITESPACE_CHARACTERS: Array,
-  RELEASE_TYPES: Array,
-  SEMVER_SPEC_VERSION: String,
-}, 'got appropriate data types exported')
+test('got appropriate data types exported', () => {
+  assert.strictEqual(typeof constants.MAX_LENGTH, 'number')
+  assert.strictEqual(typeof constants.MAX_SAFE_COMPONENT_LENGTH, 'number')
+  assert.strictEqual(typeof constants.MAX_SAFE_INTEGER, 'number')
+  assert.ok(Array.isArray(constants.WHITESPACE_CHARACTERS))
+  assert.ok(Array.isArray(constants.RELEASE_TYPES))
+  assert.strictEqual(typeof constants.SEMVER_SPEC_VERSION, 'string')
+})
 
-t.test('whitespace characters match JavaScript \\s', t => {
+test('whitespace characters match JavaScript \\s', () => {
   const expected = []
   for (let code = 0; code <= 0xffff; code++) {
     const char = String.fromCharCode(code)
@@ -20,6 +21,5 @@ t.test('whitespace characters match JavaScript \\s', t => {
       expected.push(char)
     }
   }
-  t.strictSame(constants.WHITESPACE_CHARACTERS, expected)
-  t.end()
+  assert.deepStrictEqual(constants.WHITESPACE_CHARACTERS, expected)
 })

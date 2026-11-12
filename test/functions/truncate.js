@@ -1,6 +1,7 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const truncate = require('../../functions/truncate')
 const parse = require('../../functions/parse')
 const truncations = require('../fixtures/truncations.js')
@@ -14,21 +15,19 @@ const parseAndFreezeSemVerObject = (version) => {
   return parsed
 }
 
-test('truncate fixture versions test', (t) => {
+test('truncate fixture versions test', () => {
   truncations.forEach(([pre, truncation, expected]) => {
     const actual = truncate(pre, truncation)
     const cmd = `truncate(${pre}, ${truncation})`
-    t.equal(actual, expected, `${cmd} === ${expected}`)
+    assert.strictEqual(actual, expected, `${cmd} === ${expected}`)
 
     const parsed = parseAndFreezeSemVerObject(pre)
     const semverTruncated = truncate(parsed, truncation)
-    t.equal(semverTruncated, expected, `${cmd} works on Semver object inputs`)
+    assert.strictEqual(semverTruncated, expected, `${cmd} works on Semver object inputs`)
   })
-
-  t.end()
 })
 
-test('truncate pre* only removes build info', (t) => {
+test('truncate pre* only removes build info', () => {
   ['prerelease', 'prepatch', 'preminor', 'premajor'].forEach(what => {
     validVersions.forEach((v) => {
       const versionToTruncate = v[0]
@@ -37,9 +36,8 @@ test('truncate pre* only removes build info', (t) => {
       const actual = truncate(versionToTruncate, what)
 
       const cmd = `truncate(${versionToTruncate}, ${what})`
-      t.equal(actual, expected, `${cmd} === ${expected}`)
-      t.same(parse(actual).build, [], `${cmd} build info should be removed`)
+      assert.strictEqual(actual, expected, `${cmd} === ${expected}`)
+      assert.deepStrictEqual(parse(actual).build, [], `${cmd} build info should be removed`)
     })
   })
-  t.end()
 })

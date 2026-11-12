@@ -1,9 +1,10 @@
 'use strict'
 
-const t = require('tap')
+const { describe, test } = require('node:test')
+const assert = require('node:assert')
 
 const thisVersion = require('../../package.json').version
-t.cleanSnapshot = str => str.split(thisVersion).join('@@VERSION@@')
+const cleanSnapshot = str => str.split(thisVersion).join('@@VERSION@@')
 
 const spawn = require('child_process').spawn
 const bin = require.resolve('../../bin/semver')
@@ -26,7 +27,21 @@ const run = args => new Promise((resolve, reject) => {
   })
 })
 
-t.test('inc tests', t => Promise.all([
+const snapshotTests = (cases, name = args => args.join(' ')) => {
+  for (const args of cases) {
+    test(name(args), async t => {
+      // snapshots are unavailable on Node 20 and need a flag before 22.13
+      if (typeof t.assert?.snapshot !== 'function') {
+        t.skip('snapshot testing is not supported on this version of Node')
+        return
+      }
+      const res = await run(args)
+      t.assert.snapshot({ ...res, out: cleanSnapshot(res.out), err: cleanSnapshot(res.err) })
+    })
+  }
+}
+
+describe('inc tests', () => snapshotTests([
   ['-i', 'major', '1.0.0'],
   ['-i', 'major', '1.0.0', '1.0.1'],
   ['-i', 'premajor', '1.0.0', '--preid=beta'],
@@ -36,16 +51,16 @@ t.test('inc tests', t => Promise.all([
   ['-i', 'release', '1.0.0-pre'],
   ['-i', 'major', '-i', 'minor', '1.0.0'], // last -i "wins"
   ['-i', 'invalid', '1.0.0'], // invalid -i value, should warn
-].map(args => t.resolveMatchSnapshot(run(args), args.join(' ')))))
+]))
 
-t.test('help output', t => Promise.all([
+describe('help output', () => snapshotTests([
   ['-h'],
   ['-?'],
   ['--help'],
   [],
-].map(h => t.resolveMatchSnapshot(run(h), h[0] || '(no args)'))))
+], h => h[0] || '(no args)'))
 
-t.test('sorting and filtering', t => Promise.all([
+describe('sorting and filtering', () => snapshotTests([
   ['1.2.3', '3.2.1', '2.3.4'],
   ['1.2.3', '3.2.1', '2.3.4', '2.3.4-beta'],
   ['1.2.3', '-v', '3.2.1', '--version', '2.3.4'],
@@ -58,17 +73,17 @@ t.test('sorting and filtering', t => Promise.all([
   ['1.2.3', '3.2.1', '2.3.4', '2.3.4-beta', '2.0.0asdf', '-r', '2.x', '-p'],
   ['3.2.1', '2.3.4', '2.3.4-beta', '2.0.0asdf', '-r', '2.x', '-p', '-l'],
   ['1.2.3', '3.2.1', '-r', '2.x'],
-].map(args => t.resolveMatchSnapshot(run(args), args.join(' ')))))
+]))
 
-t.test('coercing', t => Promise.all([
+describe('coercing', () => snapshotTests([
   ['1.2.3.4.5.6', '-c'],
   ['1.2.3.4.5.6', '-c', '--rtl'],
   ['1.2.3.4.5.6', '-c', '--rtl', '--ltr'],
   ['not a version', '1.2.3', '-c'],
   ['not a version', '-c'],
-].map(args => t.resolveMatchSnapshot(run(args), args.join(' ')))))
+]))
 
-t.test('args with equals', t => Promise.all([
+test('args with equals', () => Promise.all([
   [['--version', '1.2.3'], '1.2.3'],
   [['--range', '1'], ['1.2.3'], ['2.3.4'], '1.2.3'],
   [['--increment', 'major'], ['1.0.0'], '2.0.0'],
@@ -79,9 +94,9 @@ t.test('args with equals', t => Promise.all([
   const spaces = args.reduce((acc, a) => acc.concat(a), [])
   const res1 = await run(equals)
   const res2 = await run(spaces)
-  t.equal(res1.signal, null)
-  t.equal(res1.code, 0)
-  t.equal(res1.err, '')
-  t.equal(res1.out.trim(), expected)
-  t.strictSame(res1, res2, args.join(' '))
+  assert.strictEqual(res1.signal, null)
+  assert.strictEqual(res1.code, 0)
+  assert.strictEqual(res1.err, '')
+  assert.strictEqual(res1.out.trim(), expected)
+  assert.deepStrictEqual(res1, res2, args.join(' '))
 })))

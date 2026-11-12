@@ -1,45 +1,44 @@
 'use strict'
 
-const t = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const parseOptions = require('../../internal/parse-options.js')
 
-t.test('falsey values always empty options object', t => {
-  t.strictSame(parseOptions(null), {})
-  t.strictSame(parseOptions(false), {})
-  t.strictSame(parseOptions(undefined), {})
-  t.strictSame(parseOptions(), {})
-  t.strictSame(parseOptions(0), {})
-  t.strictSame(parseOptions(''), {})
-  t.end()
+test('falsey values always empty options object', () => {
+  assert.deepStrictEqual(parseOptions(null), {})
+  assert.deepStrictEqual(parseOptions(false), {})
+  assert.deepStrictEqual(parseOptions(undefined), {})
+  assert.deepStrictEqual(parseOptions(), {})
+  assert.deepStrictEqual(parseOptions(0), {})
+  assert.deepStrictEqual(parseOptions(''), {})
 })
 
-t.test('truthy non-objects always loose mode, for backwards comp', t => {
-  t.strictSame(parseOptions('hello'), { loose: true })
-  t.strictSame(parseOptions(true), { loose: true })
-  t.strictSame(parseOptions(1), { loose: true })
-  t.end()
+test('truthy non-objects always loose mode, for backwards comp', () => {
+  assert.deepStrictEqual(parseOptions('hello'), { loose: true })
+  assert.deepStrictEqual(parseOptions(true), { loose: true })
+  assert.deepStrictEqual(parseOptions(1), { loose: true })
 })
 
-t.test('any object passed is returned', t => {
-  t.strictSame(parseOptions(/asdf/), /asdf/)
-  t.strictSame(parseOptions(new Error('hello')), new Error('hello'))
-  t.strictSame(parseOptions({ loose: true, a: 1, rtl: false }), { loose: true, a: 1, rtl: false })
-  t.strictSame(parseOptions({ loose: 1, rtl: 2, includePrerelease: 10 }), {
+test('any object passed is returned', () => {
+  assert.deepStrictEqual(parseOptions(/asdf/), /asdf/)
+  assert.deepStrictEqual(parseOptions(new Error('hello')), new Error('hello'))
+  assert.deepStrictEqual(parseOptions({ loose: true, a: 1, rtl: false }),
+    { loose: true, a: 1, rtl: false })
+  assert.deepStrictEqual(parseOptions({ loose: 1, rtl: 2, includePrerelease: 10 }), {
     loose: 1,
     rtl: 2,
     includePrerelease: 10,
   })
-  t.strictSame(parseOptions({ loose: true }), { loose: true })
-  t.strictSame(parseOptions({ rtl: true }), { rtl: true })
-  t.strictSame(parseOptions({ includePrerelease: true }), { includePrerelease: true })
-  t.strictSame(parseOptions({ loose: true, rtl: true }), { loose: true, rtl: true })
-  t.strictSame(parseOptions({ loose: true, includePrerelease: true }), {
+  assert.deepStrictEqual(parseOptions({ loose: true }), { loose: true })
+  assert.deepStrictEqual(parseOptions({ rtl: true }), { rtl: true })
+  assert.deepStrictEqual(parseOptions({ includePrerelease: true }), { includePrerelease: true })
+  assert.deepStrictEqual(parseOptions({ loose: true, rtl: true }), { loose: true, rtl: true })
+  assert.deepStrictEqual(parseOptions({ loose: true, includePrerelease: true }), {
     loose: true,
     includePrerelease: true,
   })
-  t.strictSame(parseOptions({ rtl: true, includePrerelease: true }), {
+  assert.deepStrictEqual(parseOptions({ rtl: true, includePrerelease: true }), {
     rtl: true,
     includePrerelease: true,
   })
-  t.end()
 })

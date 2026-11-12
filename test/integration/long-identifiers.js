@@ -1,6 +1,7 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const {
   Range,
   SemVer,
@@ -26,21 +27,21 @@ const options = [
   { loose: true, includePrerelease: true },
 ]
 
-const checkRange = (t, input, expected, version, opts) => {
+const checkRange = (input, expected, version, opts) => {
   const range = new Range(input, opts)
   const versions = ['0.0.0-0', version, '1.2.4']
-  t.equal(range.range, expected, 'Range preserves the identifier')
-  t.equal(validRange(input, opts), expected, 'validRange preserves the identifier')
-  t.ok(range.test(version), 'Range.test accepts the matching version')
-  t.ok(satisfies(version, input, opts), 'satisfies accepts the matching version')
-  t.notOk(satisfies('0.0.0-0', input, opts), 'excludes a different prerelease')
-  t.notOk(satisfies('1.2.4', input, opts), 'excludes a different release')
-  t.equal(minVersion(input, opts).version, version, 'minVersion preserves the identifier')
-  t.equal(minSatisfying(versions, input, opts), version, 'minSatisfying selects the version')
-  t.equal(maxSatisfying(versions, input, opts), version, 'maxSatisfying selects the version')
+  assert.strictEqual(range.range, expected, 'Range preserves the identifier')
+  assert.strictEqual(validRange(input, opts), expected, 'validRange preserves the identifier')
+  assert.ok(range.test(version), 'Range.test accepts the matching version')
+  assert.ok(satisfies(version, input, opts), 'satisfies accepts the matching version')
+  assert.ok(!satisfies('0.0.0-0', input, opts), 'excludes a different prerelease')
+  assert.ok(!satisfies('1.2.4', input, opts), 'excludes a different release')
+  assert.strictEqual(minVersion(input, opts).version, version, 'minVersion preserves the identifier')
+  assert.strictEqual(minSatisfying(versions, input, opts), version, 'minSatisfying selects the version')
+  assert.strictEqual(maxSatisfying(versions, input, opts), version, 'maxSatisfying selects the version')
 }
 
-test('long numeric-prefix prereleases from #580 and #583', t => {
+test('long numeric-prefix prereleases from #580 and #583', () => {
   const versions = [
     `0.0.0-${longId}`,
     `1.1.1-${longId}`,
@@ -58,18 +59,17 @@ test('long numeric-prefix prereleases from #580 and #583', t => {
 
   for (const opts of options) {
     for (const version of versions) {
-      t.equal(valid(version, opts), version, 'valid accepts the long prerelease')
-      t.equal(new SemVer(version, opts).version, version, 'SemVer preserves the prerelease')
-      checkRange(t, `= \t ${version}`, version, version, opts)
-      checkRange(t, `>= \t ${version} <= \n ${version}`,
+      assert.strictEqual(valid(version, opts), version, 'valid accepts the long prerelease')
+      assert.strictEqual(new SemVer(version, opts).version, version, 'SemVer preserves the prerelease')
+      checkRange(`= \t ${version}`, version, version, opts)
+      checkRange(`>= \t ${version} <= \n ${version}`,
         `>=${version} <=${version}`, version, opts)
-      checkRange(t, `${version} - ${version}`, `>=${version} <=${version}`, version, opts)
+      checkRange(`${version} - ${version}`, `>=${version} <=${version}`, version, opts)
     }
   }
-  t.end()
 })
 
-test('build metadata respects version and range length limits', t => {
+test('build metadata respects version and range length limits', () => {
   const version = '1.2.3'
   const identifiers = [
     [longId, true],
@@ -82,32 +82,31 @@ test('build metadata respects version and range length limits', t => {
     for (const [identifier, rangeValid] of identifiers) {
       const input = `${version}+${identifier}`
       if (input.length <= MAX_LENGTH) {
-        t.equal(valid(input, opts), version, 'valid accepts metadata within the version limit')
-        t.strictSame(new SemVer(input, opts).build, [identifier], 'SemVer preserves metadata')
+        assert.strictEqual(valid(input, opts), version, 'valid accepts metadata within the version limit')
+        assert.deepStrictEqual(new SemVer(input, opts).build, [identifier], 'SemVer preserves metadata')
       } else {
-        t.equal(valid(input, opts), null, 'valid retains the version length limit')
-        t.throws(() => new SemVer(input, opts), TypeError, 'SemVer retains the version length limit')
+        assert.strictEqual(valid(input, opts), null, 'valid retains the version length limit')
+        assert.throws(() => new SemVer(input, opts), TypeError, 'SemVer retains the version length limit')
       }
 
       if (rangeValid) {
-        checkRange(t, `= ${input}`, version, version, opts)
-        checkRange(t, `>= ${input} <= ${input}`, `>=${version} <=${version}`, version, opts)
+        checkRange(`= ${input}`, version, version, opts)
+        checkRange(`>= ${input} <= ${input}`, `>=${version} <=${version}`, version, opts)
       } else {
         for (const range of [`= ${input}`, `>= ${input} <= ${input}`]) {
-          t.throws(() => new Range(range, opts), TypeError, 'Range retains the version length limit')
-          t.equal(validRange(range, opts), null, 'validRange retains the version length limit')
-          t.notOk(satisfies(version, range, opts), 'satisfies rejects the overlong version')
-          t.throws(() => minVersion(range, opts), TypeError, 'minVersion rejects the overlong version')
-          t.equal(minSatisfying([version], range, opts), null, 'minSatisfying rejects')
-          t.equal(maxSatisfying([version], range, opts), null, 'maxSatisfying rejects')
+          assert.throws(() => new Range(range, opts), TypeError, 'Range retains the version length limit')
+          assert.strictEqual(validRange(range, opts), null, 'validRange retains the version length limit')
+          assert.ok(!satisfies(version, range, opts), 'satisfies rejects the overlong version')
+          assert.throws(() => minVersion(range, opts), TypeError, 'minVersion rejects the overlong version')
+          assert.strictEqual(minSatisfying([version], range, opts), null, 'minSatisfying rejects')
+          assert.strictEqual(maxSatisfying([version], range, opts), null, 'maxSatisfying rejects')
         }
       }
     }
   }
-  t.end()
 })
 
-test('invalid version limits remain enforced', t => {
+test('invalid version limits remain enforced', () => {
   const versions = [
     `1.2.3-${'9'.repeat(MAX_LENGTH - '1.2.3-'.length)}a`,
     `${MAX_SAFE_INTEGER + 1}.1.1`,
@@ -118,15 +117,14 @@ test('invalid version limits remain enforced', t => {
   for (const opts of options) {
     for (const version of versions) {
       const input = `= ${version}`
-      t.equal(valid(version, opts), null, 'valid rejects the invalid version')
-      t.throws(() => new SemVer(version, opts), TypeError, 'SemVer rejects the invalid version')
-      t.throws(() => new Range(input, opts), TypeError, 'Range rejects the invalid version')
-      t.equal(validRange(input, opts), null, 'validRange rejects the invalid version')
-      t.notOk(satisfies('1.2.3', input, opts), 'satisfies rejects the invalid range')
-      t.throws(() => minVersion(input, opts), TypeError, 'minVersion rejects the invalid range')
-      t.equal(minSatisfying(['1.2.3'], input, opts), null, 'minSatisfying rejects the invalid range')
-      t.equal(maxSatisfying(['1.2.3'], input, opts), null, 'maxSatisfying rejects the invalid range')
+      assert.strictEqual(valid(version, opts), null, 'valid rejects the invalid version')
+      assert.throws(() => new SemVer(version, opts), TypeError, 'SemVer rejects the invalid version')
+      assert.throws(() => new Range(input, opts), TypeError, 'Range rejects the invalid version')
+      assert.strictEqual(validRange(input, opts), null, 'validRange rejects the invalid version')
+      assert.ok(!satisfies('1.2.3', input, opts), 'satisfies rejects the invalid range')
+      assert.throws(() => minVersion(input, opts), TypeError, 'minVersion rejects the invalid range')
+      assert.strictEqual(minSatisfying(['1.2.3'], input, opts), null, 'minSatisfying rejects the invalid range')
+      assert.strictEqual(maxSatisfying(['1.2.3'], input, opts), null, 'maxSatisfying rejects the invalid range')
     }
   }
-  t.end()
 })

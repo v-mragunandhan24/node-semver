@@ -1,6 +1,7 @@
 'use strict'
 
-const t = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const subset = require('../../ranges/subset.js')
 const Range = require('../../classes/range')
 
@@ -105,41 +106,40 @@ const cases = [
   ['>=3 >=2 >=1', '>=3 >=2 >=1', true],
   ['>2.0.0', '>=2.0.0', true],
 ]
-
-t.plan(cases.length + 1)
-cases.forEach(([sub, dom, expect, options]) => {
-  const msg = `${sub || "''"} ⊂ ${dom || "''"} = ${expect}` +
-    (options ? ' ' + Object.keys(options).join(',') : '')
-  t.equal(subset(sub, dom, options), expect, msg)
+test('subset cases', () => {
+  cases.forEach(([sub, dom, expect, options]) => {
+    const msg = `${sub || "''"} ⊂ ${dom || "''"} = ${expect}` +
+      (options ? ' ' + Object.keys(options).join(',') : '')
+    assert.strictEqual(subset(sub, dom, options), expect, msg)
+  })
 })
 
-t.test('range should be subset of itself in obj or string mode', t => {
+test('range should be subset of itself in obj or string mode', () => {
   const range = '^1'
-  t.equal(subset(range, range), true)
-  t.equal(subset(range, new Range(range)), true)
-  t.equal(subset(new Range(range), range), true)
-  t.equal(subset(new Range(range), new Range(range)), true)
+  assert.strictEqual(subset(range, range), true)
+  assert.strictEqual(subset(range, new Range(range)), true)
+  assert.strictEqual(subset(new Range(range), range), true)
+  assert.strictEqual(subset(new Range(range), new Range(range)), true)
 
   // test with using the same actual object
   const r = new Range(range)
-  t.equal(subset(r, r), true)
+  assert.strictEqual(subset(r, r), true)
 
   // different range object with same set array
   const r2 = new Range(range)
   r2.set = r.set
-  t.equal(subset(r2, r), true)
-  t.equal(subset(r, r2), true)
+  assert.strictEqual(subset(r2, r), true)
+  assert.strictEqual(subset(r, r2), true)
 
   // different range with set with same simple set arrays
   const r3 = new Range(range)
   r3.set = [...r.set]
-  t.equal(subset(r3, r), true)
-  t.equal(subset(r, r3), true)
+  assert.strictEqual(subset(r3, r), true)
+  assert.strictEqual(subset(r, r3), true)
 
   // different range with set with simple sets with same comp objects
   const r4 = new Range(range)
   r4.set = r.set.map(s => [...s])
-  t.equal(subset(r4, r), true)
-  t.equal(subset(r, r4), true)
-  t.end()
+  assert.strictEqual(subset(r4, r), true)
+  assert.strictEqual(subset(r, r4), true)
 })

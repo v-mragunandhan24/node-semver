@@ -1,38 +1,36 @@
 'use strict'
 
-const t = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const parse = require('../../functions/parse')
 const SemVer = require('../../classes/semver')
 const invalidVersions = require('../fixtures/invalid-versions')
 
-t.test('returns null instead of throwing when presented with garbage', t => {
-  t.plan(invalidVersions.length)
+test('returns null instead of throwing when presented with garbage', () => {
   invalidVersions.forEach(([v, msg, opts]) =>
-    t.equal(parse(v, opts), null, msg))
+    assert.strictEqual(parse(v, opts), null, msg))
 })
 
-t.test('throw errors if asked to', t => {
-  t.throws(() => {
+test('throw errors if asked to', () => {
+  assert.throws(() => {
     parse('bad', null, true)
   }, {
     name: 'TypeError',
     message: 'Invalid Version: bad',
   })
-  t.throws(() => {
+  assert.throws(() => {
     parse([], null, true)
   }, {
     name: 'TypeError',
     message: 'Invalid version. Must be a string. Got type "object".',
   })
-  t.end()
 })
 
-t.test('parse a version into a SemVer object', t => {
-  t.match(parse('1.2.3'), new SemVer('1.2.3'))
+test('parse a version into a SemVer object', () => {
+  assert.deepStrictEqual(parse('1.2.3'), new SemVer('1.2.3'))
   const s = new SemVer('4.5.6')
-  t.equal(parse(s), s, 'just return it if its a SemVer obj')
+  assert.strictEqual(parse(s), s, 'just return it if its a SemVer obj')
   const loose = new SemVer('4.2.0', { loose: true })
-  t.match(parse('4.2.0', true), loose, 'looseness as a boolean')
-  t.match(parse('4.2.0', { loose: true }), loose, 'looseness as an option')
-  t.end()
+  assert.deepStrictEqual(parse('4.2.0', true), loose, 'looseness as a boolean')
+  assert.deepStrictEqual(parse('4.2.0', { loose: true }), loose, 'looseness as an option')
 })

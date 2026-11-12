@@ -1,6 +1,7 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const trimComparatorWhitespace =
   require('../../internal/trim-comparator-whitespace')
 const rangeParse = require('../fixtures/range-parse')
@@ -22,17 +23,16 @@ const versions = [
   `1.2.3-${'9'.repeat(MAX_LENGTH - '1.2.3-a'.length)}a`,
 ]
 
-test('matches legacy comparator trimming for range fixtures', t => {
+test('matches legacy comparator trimming for range fixtures', () => {
   const inputs = new Set(rangeParse.map(([range]) => range.trim().replace(/\s+/g, ' ')))
   for (const range of inputs) {
-    t.equal(trimComparatorWhitespace(range),
+    assert.strictEqual(trimComparatorWhitespace(range),
       range.replace(safeRe[tokens.COMPARATORTRIM], comparatorTrimReplace),
       JSON.stringify(range))
   }
-  t.end()
 })
 
-test('removes operator whitespace without rewriting version prefixes', t => {
+test('removes operator whitespace without rewriting version prefixes', () => {
   const cases = [
     [' > 1', ' >1'],
     ['>= vvv1', '>=vvv1'],
@@ -43,12 +43,11 @@ test('removes operator whitespace without rewriting version prefixes', t => {
     ['> invalid', '> invalid'],
   ]
   for (const [input, expected] of cases) {
-    t.equal(trimComparatorWhitespace(input), expected, JSON.stringify(input))
+    assert.strictEqual(trimComparatorWhitespace(input), expected, JSON.stringify(input))
   }
-  t.end()
 })
 
-test('matches comparator trim behavior', t => {
+test('matches comparator trim behavior', () => {
   const mismatches = []
   let checked = 0
 
@@ -89,11 +88,10 @@ test('matches comparator trim behavior', t => {
     }
   }
 
-  t.strictSame(mismatches, [], `matches ${checked} bounded legacy cases`)
-  t.end()
+  assert.deepStrictEqual(mismatches, [], `matches ${checked} bounded legacy cases`)
 })
 
-test('preserves the preceding regex match boundary', t => {
+test('preserves the preceding regex match boundary', () => {
   const inputs = [
     '1.2.3 = 1.2.3',
     '1.2.3-dev = 1.2.3-dev',
@@ -115,14 +113,13 @@ test('preserves the preceding regex match boundary', t => {
     '>vvv',
   ]
   for (const input of inputs) {
-    t.equal(trimComparatorWhitespace(input),
+    assert.strictEqual(trimComparatorWhitespace(input),
       input.replace(safeRe[tokens.COMPARATORTRIM], comparatorTrimReplace),
       JSON.stringify(input))
   }
-  t.end()
 })
 
-test('preserves partial versions and bounded identifier fragments', t => {
+test('preserves partial versions and bounded identifier fragments', () => {
   const fragments = [
     'x.x.x',
     'x.x.x-',
@@ -152,27 +149,25 @@ test('preserves partial versions and bounded identifier fragments', t => {
   }
   for (const version of fragments) {
     const input = `> ${version} = 1.2.3`
-    t.equal(trimComparatorWhitespace(input),
+    assert.strictEqual(trimComparatorWhitespace(input),
       input.replace(safeRe[tokens.COMPARATORTRIM], comparatorTrimReplace),
       JSON.stringify(input))
   }
-  t.end()
 })
 
-test('skips long prefixes without retrying overlapping suffixes', t => {
+test('skips long prefixes without retrying overlapping suffixes', () => {
   const prefix = 'v= '.repeat(100000)
   for (const operator of ['', '<', '>']) {
     const input = `${operator} ${prefix}invalid`
-    t.equal(trimComparatorWhitespace(input), input, 'invalid prefix is unchanged')
+    assert.strictEqual(trimComparatorWhitespace(input), input, 'invalid prefix is unchanged')
   }
-  t.equal(trimComparatorWhitespace(`> ${prefix}1`), `>${prefix}1`,
+  assert.strictEqual(trimComparatorWhitespace(`> ${prefix}1`), `>${prefix}1`,
     'a long valid prefix retains its internal whitespace')
-  t.equal(trimComparatorWhitespace(`${prefix}< 1.2.3`), `${prefix}<1.2.3`,
+  assert.strictEqual(trimComparatorWhitespace(`${prefix}< 1.2.3`), `${prefix}<1.2.3`,
     'an invalid prefix does not hide a later comparator')
-  t.end()
 })
 
-test('digit-run lookahead does not repeatedly read overlapping suffixes', t => {
+test('digit-run lookahead does not repeatedly read overlapping suffixes', () => {
   const failedVersion = `${'0'.repeat(MAX_LENGTH)}.1.x `
   const inputs = [
     '0'.repeat(4096),
@@ -193,23 +188,21 @@ test('digit-run lookahead does not repeatedly read overlapping suffixes', t => {
         return Reflect.get(target, property)
       },
     })
-    t.equal(trimComparatorWhitespace(observed),
+    assert.strictEqual(trimComparatorWhitespace(observed),
       input.replace(safeRe[tokens.COMPARATORTRIM], comparatorTrimReplace),
       'cached lookahead preserves legacy match boundaries')
-    t.ok(reads <= input.length * 40,
+    assert.ok(reads <= input.length * 40,
       `${reads} character reads stay within the linear budget for ${input.length} characters`)
   }
-  t.end()
 })
 
-test('does not share regex iteration state', t => {
+test('does not share regex iteration state', () => {
   const regex = safeRe[tokens.COMPARATORTRIM]
   const previous = regex.lastIndex
   regex.lastIndex = 3
-  t.equal(trimComparatorWhitespace('> 1.2.3'), '>1.2.3')
-  t.equal(regex.lastIndex, 3, 'leaves the shared regex unchanged')
+  assert.strictEqual(trimComparatorWhitespace('> 1.2.3'), '>1.2.3')
+  assert.strictEqual(regex.lastIndex, 3, 'leaves the shared regex unchanged')
   regex.lastIndex = previous
-  t.equal(trimComparatorWhitespace('< 2.0.0'), '<2.0.0',
+  assert.strictEqual(trimComparatorWhitespace('< 2.0.0'), '<2.0.0',
     'repeated calls start scanning from the beginning')
-  t.end()
 })

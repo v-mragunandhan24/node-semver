@@ -4,20 +4,20 @@
   "description": "The semantic version parser used by npm.",
   "main": "index.js",
   "scripts": {
-    "test": "tap",
-    "snap": "tap",
+    "test": "node --test",
+    "snap": "node --test --test-update-snapshots './test/**/*.js'",
     "lint": "npm run eslint",
     "postlint": "template-oss-check",
     "lintfix": "npm run eslint -- --fix",
     "posttest": "npm run lint",
     "template-oss-apply": "template-oss-apply --force",
-    "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\""
+    "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
+    "test:cover": "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 './test/**/*.js'"
   },
   "devDependencies": {
     "@npmcli/eslint-config": "^7.0.0",
     "@npmcli/template-oss": "5.0.0",
-    "benchmark": "^2.1.4",
-    "tap": "^16.0.0"
+    "benchmark": "^2.1.4"
   },
   "license": "ISC",
   "repository": {
@@ -38,22 +38,15 @@
     "preload.js",
     "range.bnf"
   ],
-  "tap": {
-    "timeout": 30,
-    "coverage-map": "map.js",
-    "nyc-arg": [
-      "--exclude",
-      "tap-snapshots/**"
-    ]
-  },
   "engines": {
-    "node": ">=10"
+    "node": "^20.17.0 || >=22.9.0"
   },
   "author": "GitHub Inc.",
   "templateOSS": {
     "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
     "version": "5.0.0",
-    "engines": ">=10",
+    "engines": "^20.17.0 || >=22.9.0",
+    "testRunner": "node:test",
     "distPaths": [
       "classes/",
       "functions/",

@@ -1,6 +1,7 @@
 'use strict'
 
-const { test } = require('tap')
+const { describe, test } = require('node:test')
+const assert = require('node:assert')
 const Range = require('../../classes/range')
 const Comparator = require('../../classes/comparator')
 const rangeIntersection = require('../fixtures/range-intersection.js')
@@ -9,33 +10,29 @@ const rangeInclude = require('../fixtures/range-include.js')
 const rangeExclude = require('../fixtures/range-exclude.js')
 const rangeParse = require('../fixtures/range-parse.js')
 
-test('range tests', t => {
-  t.plan(rangeInclude.length)
+test('range tests', () => {
   rangeInclude.forEach(([range, ver, options]) => {
     const r = new Range(range, options)
-    t.ok(r.test(ver), `${range} satisfied by ${ver}`)
+    assert.ok(r.test(ver), `${range} satisfied by ${ver}`)
   })
 })
 
-test('range parsing', t => {
-  const assertions = rangeParse.reduce((count, [, expect]) =>
-    count + (expect === null ? 1 : 2), 0)
-  t.plan(assertions)
+test('range parsing', () => {
   rangeParse.forEach(([range, expect, options]) => {
     const description = `${range} ${JSON.stringify(options)}`
     if (expect === null) {
-      t.throws(() => new Range(range, options), TypeError, `invalid range: ${description}`)
+      assert.throws(() => new Range(range, options), TypeError, `invalid range: ${description}`)
     } else {
       const parsed = new Range(range, options)
-      t.equal(parsed.range || '*', expect, `${description} => ${expect}`)
-      t.equal(parsed.range,
+      assert.strictEqual(parsed.range || '*', expect, `${description} => ${expect}`)
+      assert.strictEqual(parsed.range,
         new Range(expect, { includePrerelease: parsed.includePrerelease }).range,
         `parsing both yields same result: ${description}`)
     }
   })
 })
 
-test('range parsing covers every option combination', t => {
+test('range parsing covers every option combination', () => {
   const inputsByOptions = new Map()
   for (const [range, , options] of rangeParse) {
     const loose = !!(options && options.loose)
@@ -48,17 +45,16 @@ test('range parsing covers every option combination', t => {
   }
 
   const combinations = ['false:false', 'true:false', 'false:true', 'true:true']
-  t.strictSame([...inputsByOptions.keys()], combinations, 'all four modes are present')
+  assert.deepStrictEqual([...inputsByOptions.keys()], combinations, 'all four modes are present')
   const defaultInputs = inputsByOptions.get('false:false')
-  t.equal(defaultInputs.length, 348, 'retains every source fixture row')
-  t.equal(new Set(defaultInputs).size, 335, 'retains every distinct source input')
+  assert.strictEqual(defaultInputs.length, 348, 'retains every source fixture row')
+  assert.strictEqual(new Set(defaultInputs).size, 335, 'retains every distinct source input')
   for (const key of combinations.slice(1)) {
-    t.strictSame(inputsByOptions.get(key), defaultInputs, `${key} covers the same inputs`)
+    assert.deepStrictEqual(inputsByOptions.get(key), defaultInputs, `${key} covers the same inputs`)
   }
-  t.end()
 })
 
-test('legacy range parsing options', t => {
+test('legacy range parsing options', () => {
   const cases = [
     ['>01.02.03', '>1.2.3', true],
     ['>01.02.03', null, false],
@@ -66,107 +62,94 @@ test('legacy range parsing options', t => {
     ['1.2.3', '1.2.3', {}],
     ['1.2.3', '1.2.3', { loose: false }],
   ]
-  t.plan(cases.length)
   for (const [range, expect, options] of cases) {
     if (expect === null) {
-      t.throws(() => new Range(range, options), TypeError, 'strict boolean rejects leading zeros')
+      assert.throws(() => new Range(range, options), TypeError, 'strict boolean rejects leading zeros')
     } else {
-      t.equal(new Range(range, options).range, expect, JSON.stringify(options))
+      assert.strictEqual(new Range(range, options).range, expect, JSON.stringify(options))
     }
   }
 })
 
-test('throw for empty comparator set, even in loose mode', t => {
-  t.throws(() => new Range('sadf||asdf', { loose: true }),
+test('throw for empty comparator set, even in loose mode', () => {
+  assert.throws(() => new Range('sadf||asdf', { loose: true }),
     TypeError('Invalid SemVer Range: sadf||asdf'))
-  t.end()
 })
 
-test('convert comparator to range', t => {
+test('convert comparator to range', () => {
   const c = new Comparator('>=1.2.3')
   const r = new Range(c)
-  t.equal(r.raw, c.value, 'created range from comparator')
-  t.end()
+  assert.strictEqual(r.raw, c.value, 'created range from comparator')
 })
 
-test('range as argument to range ctor', t => {
+test('range as argument to range ctor', () => {
   const loose = new Range('1.2.3', { loose: true })
-  t.equal(new Range(loose, { loose: true }), loose, 'loose option')
-  t.equal(new Range(loose, true), loose, 'loose boolean')
-  t.not(new Range(loose), loose, 'created new range if not matched')
+  assert.strictEqual(new Range(loose, { loose: true }), loose, 'loose option')
+  assert.strictEqual(new Range(loose, true), loose, 'loose boolean')
+  assert.notStrictEqual(new Range(loose), loose, 'created new range if not matched')
 
   const incPre = new Range('1.2.3', { includePrerelease: true })
-  t.equal(new Range(incPre, { includePrerelease: true }), incPre,
+  assert.strictEqual(new Range(incPre, { includePrerelease: true }), incPre,
     'include prerelease, option match returns argument')
-  t.not(new Range(incPre), incPre,
+  assert.notStrictEqual(new Range(incPre), incPre,
     'include prerelease, option mismatch does not return argument')
-
-  t.end()
 })
 
-test('negative range tests', t => {
-  t.plan(rangeExclude.length)
+test('negative range tests', () => {
   rangeExclude.forEach(([range, ver, options]) => {
     const r = new Range(range, options)
-    t.notOk(r.test(ver), `${range} not satisfied by ${ver}`)
+    assert.ok(!r.test(ver), `${range} not satisfied by ${ver}`)
   })
 })
 
-test('strict vs loose ranges', (t) => {
+test('strict vs loose ranges', () => {
   [
     ['>=01.02.03', '>=1.2.3'],
     ['~1.02.03beta', '>=1.2.3-beta <1.3.0-0'],
   ].forEach(([loose, comps]) => {
-    t.throws(() => new Range(loose))
-    t.equal(new Range(loose, true).range, comps)
+    assert.throws(() => new Range(loose))
+    assert.strictEqual(new Range(loose, true).range, comps)
   })
-  t.end()
 })
 
-test('tostrings', (t) => {
-  t.equal(new Range('>= v1.2.3').toString(), '>=1.2.3')
-  t.end()
+test('tostrings', () => {
+  assert.strictEqual(new Range('>= v1.2.3').toString(), '>=1.2.3')
 })
 
-test('formatted value is calculated lazily and cached', (t) => {
+test('formatted value is calculated lazily and cached', () => {
   const r = new Range('>= v1.2.3')
-  t.equal(r.formatted, undefined)
-  t.equal(r.format(), '>=1.2.3')
-  t.equal(r.formatted, '>=1.2.3')
-  t.equal(r.format(), '>=1.2.3')
-  t.end()
+  assert.strictEqual(r.formatted, undefined)
+  assert.strictEqual(r.format(), '>=1.2.3')
+  assert.strictEqual(r.formatted, '>=1.2.3')
+  assert.strictEqual(r.format(), '>=1.2.3')
 })
 
-test('ranges intersect', (t) => {
+describe('ranges intersect', () => {
   rangeIntersection.forEach(([r0, r1, expect]) => {
-    t.test(`${r0} <~> ${r1}`, t => {
+    test(`${r0} <~> ${r1}`, () => {
       const range0 = new Range(r0)
       const range1 = new Range(r1)
 
-      t.equal(range0.intersects(range1), expect,
+      assert.strictEqual(range0.intersects(range1), expect,
         `${r0} <~> ${r1} objects`)
-      t.equal(range1.intersects(range0), expect,
+      assert.strictEqual(range1.intersects(range0), expect,
         `${r1} <~> ${r0} objects`)
-      t.end()
     })
   })
-  t.end()
 })
 
-test('missing range parameter in range intersect', (t) => {
-  t.throws(() => {
+test('missing range parameter in range intersect', () => {
+  assert.throws(() => {
     new Range('1.0.0').intersects()
   }, new TypeError('a Range is required'),
   'throws type error')
-  t.end()
 })
 
-test('cache', (t) => {
+test('cache', () => {
   const cached = Symbol('cached')
   const r1 = new Range('1.0.0')
   r1.set[0][cached] = true
   const r2 = new Range('1.0.0')
-  t.equal(r1.set[0][cached], true)
-  t.equal(r2.set[0][cached], true) // Will be true, showing it's cached.
-  t.end()
+  assert.strictEqual(r1.set[0][cached], true)
+  assert.strictEqual(r2.set[0][cached], true) // Will be true, showing it's cached.
 })

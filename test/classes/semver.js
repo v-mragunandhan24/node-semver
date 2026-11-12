@@ -1,6 +1,7 @@
 'use strict'
 
-const { test } = require('tap')
+const { describe, test } = require('node:test')
+const assert = require('node:assert')
 const SemVer = require('../../classes/semver')
 const increments = require('../fixtures/increments.js')
 const comparisons = require('../fixtures/comparisons.js')
@@ -8,79 +9,69 @@ const equality = require('../fixtures/equality.js')
 const invalidVersions = require('../fixtures/invalid-versions.js')
 const validVersions = require('../fixtures/valid-versions.js')
 
-test('valid versions', t => {
-  t.plan(validVersions.length)
-  validVersions.forEach(([v, major, minor, patch, prerelease, build]) => t.test(v, t => {
+describe('valid versions', () => {
+  validVersions.forEach(([v, major, minor, patch, prerelease, build]) => test(v, () => {
     const s = new SemVer(v)
-    t.strictSame(s.major, major)
-    t.strictSame(s.minor, minor)
-    t.strictSame(s.patch, patch)
-    t.strictSame(s.prerelease, prerelease)
-    t.strictSame(s.build, build)
-    t.strictSame(s.raw, v)
-    t.end()
+    assert.deepStrictEqual(s.major, major)
+    assert.deepStrictEqual(s.minor, minor)
+    assert.deepStrictEqual(s.patch, patch)
+    assert.deepStrictEqual(s.prerelease, prerelease)
+    assert.deepStrictEqual(s.build, build)
+    assert.deepStrictEqual(s.raw, v)
   }))
 })
 
-test('comparisons', t => {
-  t.plan(comparisons.length)
-  comparisons.forEach(([v0, v1, opt]) => t.test(`${v0} ${v1}`, t => {
+describe('comparisons', () => {
+  comparisons.forEach(([v0, v1, opt]) => test(`${v0} ${v1}`, () => {
     const s0 = new SemVer(v0, opt)
     const s1 = new SemVer(v1, opt)
-    t.equal(s0.compare(s1), 1)
-    t.equal(s0.compare(v1), 1)
-    t.equal(s1.compare(s0), -1)
-    t.equal(s1.compare(v0), -1)
-    t.equal(s0.compare(v0), 0)
-    t.equal(s1.compare(v1), 0)
-    t.end()
+    assert.strictEqual(s0.compare(s1), 1)
+    assert.strictEqual(s0.compare(v1), 1)
+    assert.strictEqual(s1.compare(s0), -1)
+    assert.strictEqual(s1.compare(v0), -1)
+    assert.strictEqual(s0.compare(v0), 0)
+    assert.strictEqual(s1.compare(v1), 0)
   }))
 })
 
-test('equality', t => {
-  t.plan(equality.length)
-  equality.forEach(([v0, v1, loose]) => t.test(`${v0} ${v1} ${loose}`, t => {
+describe('equality', () => {
+  equality.forEach(([v0, v1, loose]) => test(`${v0} ${v1} ${loose}`, () => {
     const s0 = new SemVer(v0, loose)
     const s1 = new SemVer(v1, loose)
-    t.equal(s0.compare(s1), 0)
-    t.equal(s1.compare(s0), 0)
-    t.equal(s0.compare(v1), 0)
-    t.equal(s1.compare(v0), 0)
-    t.equal(s0.compare(s0), 0)
-    t.equal(s1.compare(s1), 0)
-    t.equal(s0.comparePre(s1), 0, 'comparePre just to hit that code path')
-    t.end()
+    assert.strictEqual(s0.compare(s1), 0)
+    assert.strictEqual(s1.compare(s0), 0)
+    assert.strictEqual(s0.compare(v1), 0)
+    assert.strictEqual(s1.compare(v0), 0)
+    assert.strictEqual(s0.compare(s0), 0)
+    assert.strictEqual(s1.compare(s1), 0)
+    assert.strictEqual(s0.comparePre(s1), 0, 'comparePre just to hit that code path')
   }))
 })
 
-test('toString equals parsed version', t => {
-  t.equal(String(new SemVer('v1.2.3')), '1.2.3')
-  t.end()
+test('toString equals parsed version', () => {
+  assert.strictEqual(String(new SemVer('v1.2.3')), '1.2.3')
 })
 
-test('throws when presented with garbage', t => {
-  t.plan(invalidVersions.length)
+test('throws when presented with garbage', () => {
   invalidVersions.forEach(([v, msg, opts]) =>
-    t.throws(() => new SemVer(v, opts), msg))
+    assert.throws(() => new SemVer(v, opts), Error, msg))
 })
 
-test('return SemVer arg to ctor if options match', t => {
+test('return SemVer arg to ctor if options match', () => {
   const s = new SemVer('1.2.3', { loose: true, includePrerelease: true })
-  t.equal(new SemVer(s, { loose: true, includePrerelease: true }), s,
+  assert.strictEqual(new SemVer(s, { loose: true, includePrerelease: true }), s,
     'get same object when options match')
-  t.not(new SemVer(s), s, 'get new object when options match')
-  t.end()
+  assert.notStrictEqual(new SemVer(s), s, 'get new object when options match')
 })
 
-test('really big numeric prerelease value', (t) => {
+test('really big numeric prerelease value', () => {
   const r = new SemVer(`1.2.3-beta.${Number.MAX_SAFE_INTEGER}0`)
-  t.strictSame(r.prerelease, ['beta', '90071992547409910'])
-  t.end()
+  assert.deepStrictEqual(r.prerelease, ['beta', '90071992547409910'])
 })
 
-test('invalid version numbers', (t) => {
+test('invalid version numbers', () => {
   ['1.2.3.4', 'NOT VALID', 1.2, null, 'Infinity.NaN.Infinity'].forEach((v) => {
-    t.throws(
+    assert.throws(
       () => {
         new SemVer(v) // eslint-disable-line no-new
       },
@@ -93,12 +84,9 @@ test('invalid version numbers', (t) => {
       }
     )
   })
-
-  t.end()
 })
 
-test('incrementing', t => {
-  t.plan(increments.length)
+describe('incrementing', () => {
   increments.forEach(([
     version,
     inc,
@@ -106,81 +94,72 @@ test('incrementing', t => {
     options,
     id,
     base,
-  ]) => t.test(`${version} ${inc} ${id || ''}`.trim(), t => {
+  ]) => test(`${version} ${inc} ${id || ''}`.trim(), () => {
     if (expect === null) {
-      t.plan(1)
-      t.throws(() => new SemVer(version, options).inc(inc, id, base))
+      assert.throws(() => new SemVer(version, options).inc(inc, id, base))
     } else {
-      t.plan(2)
       const incremented = new SemVer(version, options).inc(inc, id, base)
-      t.equal(incremented.version, expect)
+      assert.strictEqual(incremented.version, expect)
       if (incremented.build.length) {
-        t.equal(incremented.raw, `${expect}+${incremented.build.join('.')}`)
+        assert.strictEqual(incremented.raw, `${expect}+${incremented.build.join('.')}`)
       } else {
-        t.equal(incremented.raw, expect)
+        assert.strictEqual(incremented.raw, expect)
       }
     }
   }))
 })
 
-test('invalid increments', (t) => {
-  t.throws(
+test('invalid increments', () => {
+  assert.throws(
     () => new SemVer('1.2.3').inc('prerelease', '', false),
     Error('invalid increment argument: identifier is empty')
   )
-  t.throws(
+  assert.throws(
     () => new SemVer('1.2.3-dev').inc('prerelease', 'dev', false),
     Error('invalid increment argument: identifier already exists')
   )
-  t.throws(
+  assert.throws(
     () => new SemVer('1.2.3').inc('prerelease', 'invalid/preid'),
     Error('invalid identifier: invalid/preid')
   )
-
-  t.end()
 })
 
-test('increment side-effects', (t) => {
+test('increment side-effects', () => {
   const v = new SemVer('1.0.0')
   try {
     v.inc('prerelease', 'hot/mess')
   } catch (er) {
     // ignore but check that the version has not changed
   }
-  t.equal(v.toString(), '1.0.0')
-  t.end()
+  assert.strictEqual(v.toString(), '1.0.0')
 })
 
-test('compare main vs pre', (t) => {
+test('compare main vs pre', () => {
   const s = new SemVer('1.2.3')
-  t.equal(s.compareMain('2.3.4'), -1)
-  t.equal(s.compareMain('1.2.4'), -1)
-  t.equal(s.compareMain('0.1.2'), 1)
-  t.equal(s.compareMain('1.2.2'), 1)
-  t.equal(s.compareMain('1.2.3-pre'), 0)
+  assert.strictEqual(s.compareMain('2.3.4'), -1)
+  assert.strictEqual(s.compareMain('1.2.4'), -1)
+  assert.strictEqual(s.compareMain('0.1.2'), 1)
+  assert.strictEqual(s.compareMain('1.2.2'), 1)
+  assert.strictEqual(s.compareMain('1.2.3-pre'), 0)
 
   const p = new SemVer('1.2.3-alpha.0.pr.1')
-  t.equal(p.comparePre('9.9.9-alpha.0.pr.1'), 0)
-  t.equal(p.comparePre('1.2.3'), -1)
-  t.equal(p.comparePre('1.2.3-alpha.0.pr.2'), -1)
-  t.equal(p.comparePre('1.2.3-alpha.0.2'), 1)
-
-  t.end()
+  assert.strictEqual(p.comparePre('9.9.9-alpha.0.pr.1'), 0)
+  assert.strictEqual(p.comparePre('1.2.3'), -1)
+  assert.strictEqual(p.comparePre('1.2.3-alpha.0.pr.2'), -1)
+  assert.strictEqual(p.comparePre('1.2.3-alpha.0.2'), 1)
 })
 
-test('compareBuild', (t) => {
+test('compareBuild', () => {
   const noBuild = new SemVer('1.0.0')
   const build0 = new SemVer('1.0.0+0')
   const build1 = new SemVer('1.0.0+1')
   const build10 = new SemVer('1.0.0+1.0')
-  t.equal(noBuild.compareBuild(build0), -1)
-  t.equal(build0.compareBuild(build0), 0)
-  t.equal(build0.compareBuild(noBuild), 1)
+  assert.strictEqual(noBuild.compareBuild(build0), -1)
+  assert.strictEqual(build0.compareBuild(build0), 0)
+  assert.strictEqual(build0.compareBuild(noBuild), 1)
 
-  t.equal(build0.compareBuild('1.0.0+0.0'), -1)
-  t.equal(build0.compareBuild(build1), -1)
-  t.equal(build1.compareBuild(build0), 1)
-  t.equal(build10.compareBuild(build1), 1)
-
-  t.end()
+  assert.strictEqual(build0.compareBuild('1.0.0+0.0'), -1)
+  assert.strictEqual(build0.compareBuild(build1), -1)
+  assert.strictEqual(build1.compareBuild(build0), 1)
+  assert.strictEqual(build10.compareBuild(build1), 1)
 })
